@@ -33,19 +33,19 @@ namespace ClientEx1Web06.Controllers
         }
 
         [HttpPut]
-        public List<Client> UpdateClient(int index, Client client)
+        public List<Client> UpdateClient(string cpf, Client client)
         {
-            List<Client> clientUpdate = new() { Clients[index] };
-            clientUpdate[0].Name += "(antigo)";
+            int index = Clients.IndexOf(Clients.FirstOrDefault(cli => cli.Cpf == cpf));
+            List<Client> clientUpdate = new() { Clients[index] };            
             Clients[index] = client;
-            clientUpdate.Add(client);
-            clientUpdate[1].Name += "(atualizado)";
+            clientUpdate.Add(Clients[index]);
             return clientUpdate;
         }
 
         [HttpDelete]
-        public List<Client> DeleteClient(int index)
+        public List<Client> DeleteClient(string cpf)
         {
+            int index = Clients.IndexOf(Clients.FirstOrDefault(cli => cli.Cpf == cpf));
             Clients.RemoveAt(index);
             return Clients;
         }
