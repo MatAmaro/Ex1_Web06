@@ -4,6 +4,8 @@ namespace ClientEx1Web06.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Consumes("application/json")]
+    [Produces("application/json")]
     public class ClienttControllers : ControllerBase
     {
 
@@ -19,35 +21,64 @@ namespace ClientEx1Web06.Controllers
 
         
 
-        [HttpGet]
-        public List<Client> Consulta()
+        [HttpGet("clientes/consultar")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<List<Client>> Consulta()
         {
-            return Clients;
+            return Ok(Clients);
         }
 
-        [HttpPost]
-        public List<Client> InsertClient(Client client)
+        [HttpGet("clientes/{cpf}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<Client> Consulta(string cpf)
+        {          
+            if(!Clients.Any(cli => cli.Cpf == cpf))
+            {
+                return NotFound();
+            }
+            Client client = Clients.Find(cli => cli.Cpf == cpf);
+            return Ok(client);
+        }
+
+        [HttpPost("clientes/Inserir")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public ActionResult<List<Client>> InsertClient(Client client)
         {
             Clients.Add(client);
             return Clients;
         }
 
-        [HttpPut]
-        public List<Client> UpdateClient(string cpf, Client client)
+        [HttpPut("clientes/{cpf}/Atualizar")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<List<Client>> UpdateClient(string cpf, Client client)
         {
-            int index = Clients.IndexOf(Clients.FirstOrDefault(cli => cli.Cpf == cpf));
+            if (!Clients.Any(cli => cli.Cpf == cpf))
+            {
+                return NotFound();
+            }
+            int index = Clients.FindIndex(cli => cli.Cpf == cpf);
             List<Client> clientUpdate = new() { Clients[index] };            
             Clients[index] = client;
             clientUpdate.Add(Clients[index]);
-            return clientUpdate;
+            return Accepted(clientUpdate);
         }
 
-        [HttpDelete]
-        public List<Client> DeleteClient(string cpf)
+        [HttpDelete("clientes/{cpf}/Deletar")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<List<Client>> DeleteClient(string cpf)
         {
-            int index = Clients.IndexOf(Clients.FirstOrDefault(cli => cli.Cpf == cpf));
-            Clients.RemoveAt(index);
-            return Clients;
+            if (!Clients.Any(cli => cli.Cpf == cpf))
+            {
+                return NotFound();
+            }
+            Client client = Clients.Find(cli => cli.Cpf == cpf);
+            Clients.Remove(client);
+            return NoContent();
         }
     }
 }

@@ -1,10 +1,18 @@
-﻿namespace ClientEx1Web06
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ClientEx1Web06
 {
     public class Client
     {
+        [StringLength(11, ErrorMessage = "Só é possível inserir 11 caracteres")]
+        [MinLength(11, ErrorMessage = "Só é possível inserir 11 caracteres")]
+        [Required]
         public string Cpf { get; set; }
+        [Required(ErrorMessage = "Nome é obrigatório")]
         public string Name { get; set; }
+        [Required(ErrorMessage = "É necessário inserir uma data valida")]
         public DateTime BirthDate { get; set; }
+        [Range(15, 120)]
         public int Age => AgeClaculator();
 
 
