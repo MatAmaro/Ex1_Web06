@@ -28,6 +28,8 @@ namespace ClientEx1Web06.Controllers
             return Ok(Clients);
         }
 
+
+
         [HttpGet("clientes/{cpf}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -41,6 +43,8 @@ namespace ClientEx1Web06.Controllers
             return Ok(client);
         }
 
+
+
         [HttpPost("clientes/Inserir")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -49,6 +53,8 @@ namespace ClientEx1Web06.Controllers
             Clients.Add(client);
             return Clients;
         }
+
+
 
         [HttpPut("clientes/{cpf}/Atualizar")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,10 +73,12 @@ namespace ClientEx1Web06.Controllers
             return Accepted(clientUpdate);
         }
 
+
+
         [HttpDelete("clientes/{cpf}/Deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<Client>> DeleteClient(string cpf)
+        public IActionResult DeleteClient(string cpf)
         {
             if (!Clients.Any(cli => cli.Cpf == cpf))
             {
