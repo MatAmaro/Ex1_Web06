@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClientEx1Web06.Repository;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ClientEx1Web06.Controllers
 {
@@ -9,23 +10,23 @@ namespace ClientEx1Web06.Controllers
     public class ClienttControllers : ControllerBase
     {
 
-        public static List<Client> Clients { get; set; } = new()
+        private readonly IConfiguration _configuration;
+        public ClientRepository _repository { get; set; }
+        public List<Client> ClientList { get; set; }
+
+        public ClienttControllers(IConfiguration configuration)
         {
-            { new Client("12345678909", "Ricardo", DateTime.Parse("07/11/2001")) },
-            { new Client("98765432111", "Daniel", DateTime.Parse("15/10/1996")) },
-            { new Client("87445954857", "Vera", DateTime.Parse("15/11/1984")) },
-            { new Client("16562675299", "Marcus", DateTime.Parse("03/04/2003")) },
-            { new Client("55478941544", "Matheus", DateTime.Parse("05/06/2002")) }
+            _repository = new ClientRepository(configuration);
+            ClientList = new List<Client>();
 
-        };
-
-        
+        }
 
         [HttpGet("clientes/consultar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<List<Client>> Consulta()
         {
-            return Ok(Clients);
+
+            return Ok(_repository.GetClients());
         }
 
 
@@ -34,12 +35,12 @@ namespace ClientEx1Web06.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<Client> Consulta(string cpf)
-        {          
-            if(!Clients.Any(cli => cli.Cpf == cpf))
+        {
+            var client = _repository.GetClientByCpf(cpf);
+            if (client == null)
             {
                 return NotFound();
             }
-            Client client = Clients.Find(cli => cli.Cpf == cpf);
             return Ok(client);
         }
 
@@ -48,10 +49,13 @@ namespace ClientEx1Web06.Controllers
         [HttpPost("clientes/Inserir")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public ActionResult<List<Client>> InsertClient(Client client)
+        public IActionResult PostClient(Client client)
         {
-            Clients.Add(client);
-            return Clients;
+            if (!_repository.InsertClient(client))
+            {
+                return BadRequest();
+            }
+            return CreatedAtAction(nameof(PostClient), client);
         }
 
 
@@ -62,31 +66,32 @@ namespace ClientEx1Web06.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ActionResult<List<Client>> UpdateClient(string cpf, Client client)
         {
-            if (!Clients.Any(cli => cli.Cpf == cpf))
+            List<Client> clientUpdate = new();
+            Client oldCli = _repository.GetClientByCpf(cpf);
+            if(oldCli == null)
             {
                 return NotFound();
             }
-            int index = Clients.FindIndex(cli => cli.Cpf == cpf);
-            List<Client> clientUpdate = new() { Clients[index] };            
-            Clients[index] = client;
-            clientUpdate.Add(Clients[index]);
+            clientUpdate.Add(oldCli);
+            _repository.UpdateClient(cpf, client);
+            clientUpdate.Add(client);
             return Accepted(clientUpdate);
         }
 
 
 
-        [HttpDelete("clientes/{cpf}/Deletar")]
+        [HttpDelete("clientes/{cpf}/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult DeleteClient(string cpf)
+        public IActionResult deleteclient(string cpf)
         {
-            if (!Clients.Any(cli => cli.Cpf == cpf))
+            if (!_repository.DeleteClient(cpf))
             {
                 return NotFound();
             }
-            Client client = Clients.Find(cli => cli.Cpf == cpf);
-            Clients.Remove(client);
+           
             return NoContent();
         }
     }
 }
+

@@ -4,40 +4,47 @@ namespace ClientEx1Web06
 {
     public class Client
     {
-        [StringLength(11, ErrorMessage = "Só é possível inserir 11 caracteres")]
-        [MinLength(11, ErrorMessage = "Só é possível inserir 11 caracteres")]
+        public long Id { get; set; }
+
+        [StringLength(11, ErrorMessage = "Só é possível inserir 11 caracteres", MinimumLength = 11)] 
         [Required]
-        public string Cpf { get; set; }
+        public string cpf { get; set; }
+
         [Required(ErrorMessage = "Nome é obrigatório")]
-        public string Name { get; set; }
+        public string Nome { get; set; }
+
         [Required(ErrorMessage = "É necessário inserir uma data valida")]
-        public DateTime BirthDate { get; set; }
+        public DateTime DataNascimento { get; set; }
+
         [Range(15, 120)]
-        public int Age => AgeClaculator();
+        public int Idade => AgeCalculator();
 
-
-        private int AgeClaculator()
+        public Client()
         {
-            int yearsDiference = DateTime.Now.Year - BirthDate.Year;
+        }
+
+        public Client(long id, string cpf, string nome, DateTime datanascimento, int age)
+        {
+            Id = id;
+            this.cpf = cpf;
+            Nome = nome;
+            DataNascimento = datanascimento;
+        }
+
+        private int AgeCalculator()
+        {
+            int yearsDiference = DateTime.Now.Year - DataNascimento.Year;
             int age;
-            DateTime birthday = BirthDate.AddYears(yearsDiference);
+            DateTime birthday = DataNascimento.AddYears(yearsDiference);
             if (DateTime.Now >= birthday)
             {
-                age = DateTime.Now.Year - BirthDate.Year;
+                age = DateTime.Now.Year - DataNascimento.Year;
             }
             else
             {
-                age = DateTime.Now.Year - BirthDate.Year - 1;
+                age = DateTime.Now.Year - DataNascimento.Year - 1;
             }
             return age;
-        }
-
-        public Client(string cpf, string name, DateTime birthDate)
-        {
-            Cpf = cpf;
-            Name = name;
-            BirthDate = birthDate;
-
         }
     }
 }
