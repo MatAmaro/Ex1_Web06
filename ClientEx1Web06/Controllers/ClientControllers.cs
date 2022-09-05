@@ -1,4 +1,5 @@
-﻿using ClientEx1Web06.Repository;
+﻿using ApiClientes.Core.Interfaces;
+using ApiClientes.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientEx1Web06.Controllers
@@ -10,33 +11,26 @@ namespace ClientEx1Web06.Controllers
     public class ClienttControllers : ControllerBase
     {
 
-        private readonly IConfiguration _configuration;
-        public ClientRepository _repository { get; set; }
-        public List<Client> ClientList { get; set; }
-
-        public ClienttControllers(IConfiguration configuration)
+        public IClienteService _clienteService;
+        
+        public ClienttControllers(IClienteService clienteService)
         {
-            _repository = new ClientRepository(configuration);
-            ClientList = new List<Client>();
-
+            _clienteService = clienteService;
         }
 
         [HttpGet("clientes/consultar")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<List<Client>> Consulta()
+        public ActionResult<List<Cliente>> Consulta()
         {
-
-            return Ok(_repository.GetClients());
+            return Ok(_clienteService.GetClientes());
         }
-
-
 
         [HttpGet("clientes/{cpf}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Client> Consulta(string cpf)
+        public ActionResult<Cliente> Consulta(string cpf)
         {
-            var client = _repository.GetClientByCpf(cpf);
+            var client = _clienteService.GetClienteByCpf(cpf);
             if (client == null)
             {
                 return NotFound();
@@ -44,48 +38,42 @@ namespace ClientEx1Web06.Controllers
             return Ok(client);
         }
 
-
-
         [HttpPost("clientes/Inserir")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public IActionResult PostClient(Client client)
+        public IActionResult PostClient(Cliente client)
         {
-            if (!_repository.InsertClient(client))
+            if (!_clienteService.InsertCliente(client))
             {
                 return BadRequest();
             }
             return CreatedAtAction(nameof(PostClient), client);
         }
 
-
-
         [HttpPut("clientes/{cpf}/Atualizar")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<List<Client>> UpdateClient(string cpf, Client client)
+        public ActionResult<List<Cliente>> UpdateClient(string cpf, Cliente client)
         {
-            List<Client> clientUpdate = new();
-            Client oldCli = _repository.GetClientByCpf(cpf);
+            List<Cliente> clientUpdate = new();
+            Cliente oldCli = _clienteService.GetClienteByCpf(cpf);
             if(oldCli == null)
             {
                 return NotFound();
             }
             clientUpdate.Add(oldCli);
-            _repository.UpdateClient(cpf, client);
+            _clienteService.UpdateCliente(cpf, client);
             clientUpdate.Add(client);
             return Accepted(clientUpdate);
         }
-
-
 
         [HttpDelete("clientes/{cpf}/deletar")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult deleteclient(string cpf)
         {
-            if (!_repository.DeleteClient(cpf))
+            if (!_clienteService.DeleteCliente(cpf))
             {
                 return NotFound();
             }

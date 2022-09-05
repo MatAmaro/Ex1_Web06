@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ClientEx1Web06
+namespace ApiClientes.Core.Models
 {
-    public class Client
+    public class Cliente
     {
         public long Id { get; set; }
 
@@ -19,11 +19,11 @@ namespace ClientEx1Web06
         [Range(15, 120)]
         public int Idade => AgeCalculator();
 
-        public Client()
+        public Cliente()
         {
         }
 
-        public Client(long id, string cpf, string nome, DateTime datanascimento, int age)
+        public Cliente(long id, string cpf, string nome, DateTime datanascimento, int age)
         {
             Id = id;
             this.cpf = cpf;
