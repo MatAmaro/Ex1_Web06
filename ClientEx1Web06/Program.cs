@@ -1,5 +1,6 @@
 using ApiClientes.Core.Interfaces;
 using ApiClientes.Core.Services;
+using ApiClientes.Filters;
 using ApiClientes.Infra;
 using ApiClientes.Infra.Repository;
 
@@ -15,6 +16,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IClienteService,ClienteService>();
 builder.Services.AddScoped<IClienteRepository,ClienteRepository>();
 builder.Services.AddScoped<IConnectionDataBase,ConnectionDataBase>();
+builder.Services.AddScoped<ActionFilterCpfPost>();
+builder.Services.AddScoped<ActionFilterCpfUpdate>();
+
+builder.Services.AddMvc(options => options.Filters.Add<ExceptionFilter>());
+
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 ﻿using ApiClientes.Core.Interfaces;
 using ApiClientes.Core.Models;
+using ApiClientes.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClientEx1Web06.Controllers
@@ -8,6 +9,7 @@ namespace ClientEx1Web06.Controllers
     [Route("[controller]")]
     [Consumes("application/json")]
     [Produces("application/json")]
+    [TypeFilter(typeof(ResourceFilterTime))]
     public class ClienttControllers : ControllerBase
     {
 
@@ -41,6 +43,7 @@ namespace ClientEx1Web06.Controllers
         [HttpPost("clientes/Inserir")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [TypeFilter(typeof(ActionFilterCpfPost))]
         public IActionResult PostClient(Cliente client)
         {
             if (!_clienteService.InsertCliente(client))
@@ -54,6 +57,7 @@ namespace ClientEx1Web06.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status202Accepted)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [TypeFilter(typeof(ActionFilterCpfUpdate))]
         public ActionResult<List<Cliente>> UpdateClient(string cpf, Cliente client)
         {
             List<Cliente> clientUpdate = new();
